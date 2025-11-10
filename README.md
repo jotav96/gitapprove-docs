@@ -143,15 +143,6 @@ gitapprove upload
 - ✅ Histórico completo de ações
 - ✅ Sem armazenamento de senhas
 
-## 🌐 Deploy
-
-O GitApprove pode ser deployado em:
-- ✅ **Koyeb** (Free tier - Recomendado)
-- ✅ **Fly.io** (Free tier)
-- ✅ **Railway** (Free tier)
-- ✅ **Oracle Cloud** (Always Free)
-- ✅ **VPS próprio** (Docker)
-
 ## 📚 Recursos
 
 - [Guia de Instalação CLI](./CLI-INSTALL.md)
