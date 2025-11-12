@@ -1,144 +1,275 @@
-# Guia Rápido - GitApprove
+# 🚀 Guia Rápido - GitApprove
 
-## 🚀 Início Rápido em 5 Minutos
+Comece a usar o GitApprove em **5 minutos**!
 
-### 1. Login no Dashboard (OAuth Automático!)
-1. Acesse: https://gitapprove.koyeb.app
-2. Clique em **"Login com GitHub"**
-3. Autorize o aplicativo
-4. **GitHub token OAuth salvo automaticamente!** 🎉
+## 📦 Passo 1: Instalação (30 segundos)
 
-### 2. Gere seu Token CLI
-1. **Dashboard** → **Configurações** (⚙️)
-2. **Gerar Token CLI**
-3. Copie o token (formato: `gat_...`)
-
-### 3. Instale o CLI
 ```bash
 npm install -g gitapprove
 ```
 
-### 4. Configure
-```bash
-gitapprove config --token gat_seu_token
-gitapprove whoami
-```
-
-### 5. Use!
-```bash
-cd ~/seu-projeto
-git commit -m "feat: nova feature"
-gitapprove upload
-```
-
-**Aguarde aprovação → Push automático via OAuth! 🚀**
-
-## 📋 Fluxo de Trabalho Completo
-
-### Para quem FAZ commits:
+## 🔐 Passo 2: Autenticação (1 minuto)
 
 ```bash
-# 1. Trabalhe normalmente
-git add arquivo.js
-git commit -m "feat: adicionar login"
-
-# 2. NÃO faça git push!
-
-# 3. Envie para aprovação
-gitapprove upload
-
-# 4. Aguarde aprovações do time
-gitapprove list
-
-# 5. Quando aprovado, push é automático via OAuth!
+gitapprove login
 ```
 
-### Para quem APROVA commits:
+**O que acontece:**
+1. ✅ CLI abre seu navegador automaticamente
+2. ✅ Você vê a página: https://gitapprove.koyeb.app/dashboard/cli-auth
+3. ✅ Clique em **"Gerar Código de Autenticação"**
+4. ✅ Copie o código e cole no terminal
+5. ✅ **Pronto!** Token salvo automaticamente em `~/.gitaprove/config.json`
 
-1. Acesse: https://gitapprove.koyeb.app/dashboard/pending
-2. Veja commits dos colegas
-3. Revise o código
-4. Clique: ✓ Aprovar ou ✗ Rejeitar
-5. Sistema faz push automático quando todos aprovarem
+**Se já estiver logado:**
+```bash
+gitapprove login
+# ⚠️  Você já está autenticado!
+# 👤 Usuário atual: seu-username
+# Deseja fazer logout e autenticar novamente? (s/N):
+```
 
-## 🎯 Comandos Mais Usados
+## 💻 Passo 3: Primeiro Commit (2 minutos)
+
+### 3.1. Fazer commits localmente
+
+```bash
+# No seu repositório
+git add .
+git commit -m "feat: minha primeira feature"
+```
+
+### 3.2. Enviar para aprovação
+
+```bash
+# ⚠️ NÃO USE: git push
+# ✅ USE ISTO:
+gitapprove upload owner/repo
+
+# Exemplos:
+gitapprove upload jotav96/meu-projeto              # Branch main (padrão)
+gitapprove upload jotav96/meu-projeto -b develop   # Branch develop
+gitapprove upload jotav96/meu-projeto --branch feature/nova-funcionalidade
+```
+
+**Saída esperada:**
+```
+📤 Preparando 1 commit(s) para envio...
+  ✓ abc1234 - feat: minha primeira feature (3 arquivo(s))
+
+📡 Enviando para GitApprove...
+✓ 1 commit(s) enviado(s) com sucesso!
+
+🔗 Ver no dashboard: https://gitapprove.koyeb.app/dashboard/pending
+```
+
+### 3.3. Aguardar aprovação
+
+Seu time recebe notificação e pode:
+- Ver o código no dashboard
+- Aprovar ou rejeitar
+- Adicionar comentários
+
+### 3.4. Push automático! 🎉
+
+Quando **todos os membros do time** aprovarem:
+- ✅ Sistema faz `git push` automaticamente
+- ✅ Commit aparece no GitHub
+- ✅ Você recebe notificação
+
+## 📋 Comandos Úteis
 
 ```bash
 # Ver seus commits pendentes
 gitapprove list
 
-# Enviar commit para aprovação
-gitapprove upload
+# Ver todos os commits (incluindo aprovados/rejeitados)
+gitapprove list --all
 
-# Ver quem você é
-gitapprove whoami
+# Ver seu status e estatísticas
+gitapprove status
 
-# Enviar múltiplos commits
-gitapprove upload -n 3
+# Verificar se há atualizações do CLI
+gitapprove update-check
+
+# Ver ajuda completa
+gitapprove --help
 ```
 
-## 💡 Dicas
+## 🎯 Workflow Completo
 
-✅ **Faça commits pequenos** - Mais fácil de revisar  
-✅ **Mensagens claras** - Use conventional commits  
-✅ **Não force push** - Aguarde aprovação  
-✅ **Revise rápido** - Não deixe o time esperando  
-✅ **Login regular** - Mantenha token OAuth válido
-
-## ⚡ Como Funciona o Push Automático
-
+```mermaid
+graph LR
+    A[git commit] --> B[gitapprove upload]
+    B --> C[Dashboard]
+    C --> D{Time aprova?}
+    D -->|Sim| E[Push automático]
+    D -->|Não| F[Rejeitar + comentário]
+    E --> G[GitHub ✅]
+    F --> A
 ```
-Login GitHub → Token OAuth salvo → Commit aprovado → Push via API → Pronto!
-```
 
-**Nenhuma configuração manual! Totalmente automático! 🎉**
+### Em texto:
+1. **Você:** Faz commits localmente (`git add` + `git commit`)
+2. **Você:** Envia para revisão (`gitapprove upload owner/repo`)
+3. **Time:** Revisa no dashboard web
+4. **Time:** Aprova ou rejeita com comentários
+5. **Sistema:** Faz push automático quando todos aprovarem
+6. **Pronto:** Código no GitHub! 🎉
 
-## ❌ Erros Comuns
+## 🔧 Configuração de Projeto (Primeira vez)
 
-### "Token CLI inválido"
+### No Dashboard Web
+
+1. Acesse: https://gitapprove.koyeb.app/dashboard/projects
+2. Clique em **"Criar Novo Projeto"**
+3. Selecione seu repositório GitHub
+4. Configure o time de revisores
+5. Salve!
+
+### Proteger a Branch (Recomendado)
+
+Para **impedir push direto** e forçar uso do GitApprove:
+
 ```bash
-# Gere novo token no dashboard e configure
-gitapprove config --token gat_novo_token
+# Método 1: Git local
+git config branch.main.pushRemote no-push
+git config branch.develop.pushRemote no-push
+
+# Método 2: GitHub Settings
+# Acesse: github.com/owner/repo/settings/branches
+# Add rule: Require pull request reviews before merging
 ```
 
-### "Não é um repositório git"
+## 🌿 Trabalhando com Branches
+
 ```bash
-# Execute dentro de uma pasta Git
-cd ~/seu-projeto-git
-gitapprove upload
+# Main (padrão)
+gitapprove upload owner/repo
+
+# Develop
+gitapprove upload owner/repo --branch develop
+
+# Feature branch
+gitapprove upload owner/repo --branch feature/login
+
+# Hotfix
+gitapprove upload owner/repo -b hotfix/critical-bug
+
+# Release
+gitapprove upload owner/repo -b release/v2.0.0
 ```
 
-### "Nenhum commit para enviar"
+## 🆘 Problemas Comuns
+
+### ❌ "Invalid token"
+**Solução:**
 ```bash
-# Certifique-se que fez commit antes
-git log  # Veja se tem commits
+gitapprove login
+# Faça login novamente para gerar novo token
 ```
 
-### "Push automático falhou"
+### ❌ "Nenhum commit local para enviar"
+**Solução:**
 ```bash
-# Token OAuth expirado - Faça logout e login novamente
-# Ou repositório vazio - Faça push inicial manualmente
+git log origin/main..HEAD
+# Verifique se tem commits não enviados
+# Se não houver, faça novos commits primeiro
 ```
 
-### "Repositório vazio"
-Se o repo não tem commits ainda:
+### ❌ "Você não é membro do time responsável"
+**Solução:**
+- Peça ao dono do projeto para adicionar você ao time
+- Dashboard → Projetos → Seu Projeto → Time → Adicionar Membro
+
+### ❌ Push automático falhou
+**Solução:**
+1. Dono do projeto: faça logout e login no dashboard
+2. Isso renova o token OAuth do GitHub
+3. Tente aprovar novamente
+
+## 📱 Usando o Dashboard
+
+### Ver Commits Pendentes
+https://gitapprove.koyeb.app/dashboard/pending
+
+### Aprovar Commit
+1. Clique no commit
+2. Revise os arquivos (diff completo disponível)
+3. Clique em **"Aprovar"**
+4. (Opcional) Adicione comentário
+
+### Rejeitar Commit
+1. Clique no commit
+2. Clique em **"Rejeitar"**
+3. **Obrigatório:** Adicione comentário explicando o motivo
+4. Desenvolvedor verá o feedback no CLI
+
+### Ver Histórico
+https://gitapprove.koyeb.app/dashboard/history
+
+## 🎓 Próximos Passos
+
+Agora que você sabe o básico:
+
+- 📖 Leia o [README completo](./README.md) para recursos avançados
+- ❓ Veja a [FAQ](./FAQ.md) para dúvidas específicas
+- 📝 Confira o [CHANGELOG](./CHANGELOG.md) para novidades
+- 🐛 Reporte bugs: https://github.com/jotav96/GitApprove/issues
+
+## 💡 Dicas Pro
+
+### 1. Alias úteis
 ```bash
-echo "# Meu Projeto" > README.md
-git add README.md
-git commit -m "Initial commit"
-git push origin main
+# Adicione ao ~/.bashrc ou ~/.zshrc
+alias gap='gitapprove upload'
+alias gal='gitapprove list'
+alias gas='gitapprove status'
 
-# Agora use GitApprove
-gitapprove upload
+# Uso:
+gap owner/repo
+gap owner/repo -b develop
 ```
 
-## 📚 Próximos Passos
+### 2. Verificar antes de enviar
+```bash
+# Ver commits que serão enviados
+git log origin/main..HEAD --oneline
 
-- [Workflow Completo](./WORKFLOW.md)
-- [Instalação Completa](./CLI-INSTALL.md)
-- [FAQ](./FAQ.md)
-- [README Principal](./README.md)
+# Ver arquivos modificados
+git diff origin/main..HEAD --stat
+```
+
+### 3. Múltiplos commits de uma vez
+```bash
+# Todos os commits não enviados serão incluídos
+git commit -m "feat: funcionalidade A"
+git commit -m "fix: correção B"
+git commit -m "docs: atualizar README"
+
+gitapprove upload owner/repo
+# Envia os 3 commits de uma vez!
+```
+
+### 4. Atalho do navegador
+Adicione aos favoritos:
+- Pendentes: https://gitapprove.koyeb.app/dashboard/pending
+- Meus commits: https://gitapprove.koyeb.app/dashboard/approvals
 
 ---
 
-**Desenvolvido por José Vitor**
+## ✅ Checklist de Setup
+
+- [ ] CLI instalado (`npm install -g gitapprove`)
+- [ ] Login feito (`gitapprove login`)
+- [ ] Projeto criado no dashboard
+- [ ] Time configurado
+- [ ] Branch protegida no GitHub (opcional mas recomendado)
+- [ ] Primeiro commit enviado e aprovado
+- [ ] Time entende o fluxo
+
+**Tudo pronto?** Comece a usar! 🚀
+
+---
+
+**Dúvidas?** Veja a [FAQ](./FAQ.md) ou abra uma issue.

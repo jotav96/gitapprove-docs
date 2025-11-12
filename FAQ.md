@@ -1,234 +1,526 @@
-# FAQ - Perguntas Frequentes
+# ❓ FAQ - Perguntas Frequentes
 
-## 🤔 Geral
+## 📦 Instalação e Setup
 
-### O que é o GitApprove?
-Sistema de aprovação colaborativa de commits. Todo commit precisa da aprovação de TODOS os membros do time antes de ir para o GitHub.
+### Como instalar o GitApprove CLI?
 
-### É gratuito?
-Sim! O CLI é open source (NPM) e o sistema pode ser auto-hospedado gratuitamente.
-
-### Preciso pagar?
-Não. Use a versão hospedada em https://gitapprove.koyeb.app gratuitamente ou instale em seu próprio servidor.
-
-## 🔐 OAuth e Tokens
-
-### Como funciona o push automático?
-Quando você faz login com GitHub, o sistema recebe um token OAuth com permissão `repo`. Esse token é salvo automaticamente e usado para fazer push via GitHub API quando um commit é totalmente aprovado.
-
-### Preciso configurar GitHub token manualmente?
-**Não!** O token OAuth é configurado automaticamente no login. Apenas faça login novamente se o push falhar.
-
-### Qual a diferença entre token OAuth e token CLI?
-- **Token OAuth** (automático): Para push no GitHub, salvo no login
-- **Token CLI** (`gat_...`): Para autenticação do CLI com o sistema GitApprove
-
-### O token OAuth expira?
-Sim, mas o sistema renova automaticamente. Se o push falhar, faça logout e login novamente no dashboard.
-
-### O que acontece se o repositório estiver vazio?
-Se o repo não tiver commits ainda, você precisa fazer um push inicial manualmente:
-```bash
-echo "# Meu Projeto" > README.md
-git add README.md
-git commit -m "Initial commit"
-git push origin main
-```
-Depois use `gitapprove upload` normalmente!
-
-## 💻 CLI
-
-### Como instalo o CLI?
 ```bash
 npm install -g gitapprove
 ```
 
-### Onde obtenho o token CLI?
-1. Acesse https://gitapprove.koyeb.app
-2. Login com GitHub (OAuth automático!)
-3. Configurações → Gerar Token CLI
+Requer Node.js 14+ e npm.
 
-### O token CLI expira?
-Não. Tokens CLI são permanentes até serem revogados manualmente.
+### Como fazer login?
 
-### Posso usar em múltiplos computadores?
-Sim! Use o mesmo token CLI em todos os computadores.
+```bash
+gitapprove login
+```
 
-### Como atualizo o CLI?
+O CLI abre automaticamente o navegador em https://gitapprove.koyeb.app/dashboard/cli-auth. Clique em "Gerar Código", cole no terminal, pronto!
+
+### Preciso editar arquivos de configuração manualmente?
+
+**Não!** O token é salvo automaticamente após o `gitapprove login`. O arquivo `~/.gitaprove/config.json` é criado e gerenciado pelo CLI.
+
+### E se eu já estiver logado e executar `gitapprove login` novamente?
+
+O CLI detecta e pergunta se você quer fazer logout primeiro:
+```
+⚠️  Você já está autenticado!
+👤 Usuário atual: seu-username
+Deseja fazer logout e autenticar novamente? (s/N):
+```
+
+### Onde fica o arquivo de configuração?
+
+```bash
+~/.gitaprove/config.json
+```
+
+Contém:
+```json
+{
+  "apiUrl": "https://gitapprove.koyeb.app",
+  "token": "gat_seu_token_aqui",
+  "username": "seu-username"
+}
+```
+
+### Como atualizar o CLI?
+
+```bash
+npm update -g gitapprove
+
+# Ou verificar se há atualizações
+gitapprove update-check
+```
+
+---
+
+## 🔐 Autenticação e Segurança
+
+### Qual a diferença entre token CLI e token OAuth do GitHub?
+
+- **Token CLI** (`gat_...`): Para autenticar o CLI com o GitApprove
+- **Token OAuth**: Obtido automaticamente no login web, usado para push automático
+
+Você **não precisa** gerenciar o token OAuth manualmente!
+
+### Meu token CLI expira?
+
+Não! Os tokens CLI são permanentes. Mas você pode gerar um novo a qualquer momento com `gitapprove login`.
+
+### Como revogar meu token?
+
+Faça login novamente:
+```bash
+gitapprove login
+```
+
+Isso gera um novo token e invalida o anterior automaticamente.
+
+### É seguro armazenar o token em texto plano?
+
+O token fica em `~/.gitaprove/config.json` com permissões de leitura apenas para seu usuário (Unix/Linux). Trate-o como senha - não commite em repositórios públicos.
+
+### Posso usar o mesmo token em múltiplos computadores?
+
+Tecnicamente sim, mas **não é recomendado**. Cada máquina deveria ter seu próprio token. Execute `gitapprove login` em cada computador.
+
+---
+
+## 💻 Uso Diário
+
+### Como enviar commits para aprovação?
+
+```bash
+# Fazer commits normalmente
+git add .
+git commit -m "feat: nova funcionalidade"
+
+# Enviar para aprovação (NÃO use git push!)
+gitapprove upload owner/repo
+```
+
+### Como enviar para uma branch específica?
+
+```bash
+gitapprove upload owner/repo --branch develop
+gitapprove upload owner/repo -b feature/login
+```
+
+Se não especificar, usa `main` como padrão.
+
+### Posso enviar múltiplos commits de uma vez?
+
+Sim! Todos os commits locais não enviados serão incluídos:
+
+```bash
+git commit -m "feat: A"
+git commit -m "fix: B"
+git commit -m "docs: C"
+
+gitapprove upload owner/repo
+# Envia os 3 commits!
+```
+
+### Como ver meus commits pendentes?
+
+```bash
+gitapprove list              # Apenas pendentes
+gitapprove list --all        # Todos (aprovados, rejeitados, pendentes)
+```
+
+### Como ver estatísticas?
+
+```bash
+gitapprove status
+```
+
+Mostra:
+- Usuário logado
+- Total de commits enviados
+- Aprovados/Rejeitados/Pendentes
+- Taxa de aprovação
+
+### E se eu cometer um erro no commit?
+
+Você pode:
+1. **Antes de enviar**: `git commit --amend` ou `git reset`
+2. **Depois de enviar**: Rejeite seu próprio commit no dashboard e envie um novo
+
+---
+
+## 👥 Times e Aprovações
+
+### Quantas aprovações são necessárias?
+
+**Todos os membros do time** (exceto o autor) precisam aprovar.
+
+Exemplo: Time com 4 pessoas
+- Autor envia commit
+- 3 outros membros precisam aprovar
+- Quando o 3º aprovar → push automático!
+
+### Posso aprovar meu próprio commit?
+
+**Não!** O sistema bloqueia auto-aprovação para garantir revisão por pares.
+
+### O que acontece quando todos aprovam?
+
+1. Status muda para "Aprovado"
+2. Sistema faz `git push` automaticamente para o GitHub
+3. Todos recebem notificação
+4. Commit aparece no GitHub com o autor original preservado
+
+### E se alguém rejeitar?
+
+- Commit fica com status "Rejeitado"
+- Desenvolvedor vê o motivo no CLI ou dashboard
+- Precisa fazer correções e enviar novo commit
+- O commit rejeitado não pode ser reaprovado
+
+### Posso adicionar comentários ao aprovar?
+
+Sim! Comentários são opcionais ao aprovar, mas **obrigatórios** ao rejeitar.
+
+---
+
+## 🚀 Push Automático
+
+### Como funciona o push automático?
+
+Quando todos aprovam:
+1. Sistema busca o token OAuth do GitHub do dono do projeto
+2. Usa a GitHub API para criar o commit
+3. Preserva autor original, mensagem e arquivos
+4. Marca commit como "pushed" no banco
+
+### O push automático falhou, e agora?
+
+**Solução:**
+1. Dono do projeto: Logout + Login no dashboard web
+2. Isso renova o token OAuth do GitHub
+3. Tente aprovar novamente
+
+### Posso fazer push manual?
+
+Sim, mas **não é recomendado**:
+```bash
+gitapprove push
+```
+
+Use apenas se o push automático falhar repetidamente.
+
+### O push respeita o autor original do commit?
+
+Sim! O commit no GitHub aparece com:
+- Autor original
+- Data original  
+- Mensagem original
+- Arquivos exatos
+
+### Funciona com repositórios privados?
+
+Sim! O token OAuth tem permissão completa de `repo`.
+
+---
+
+## 🔧 Projetos e Configuração
+
+### Como criar um projeto?
+
+1. Acesse https://gitapprove.koyeb.app/dashboard/projects
+2. Clique em "Criar Novo Projeto"
+3. Selecione seu repositório GitHub
+4. Configure o time
+5. Salve!
+
+### Posso ter múltiplos projetos?
+
+Sim! Cada repositório pode ser um projeto separado.
+
+### Como adicionar membros ao time?
+
+Dashboard → Projetos → Seu Projeto → Time → Adicionar Membro
+
+### Preciso criar branch no GitHub antes de enviar commits?
+
+Sim! A branch precisa existir no repositório remoto. Se não existir, crie:
+
+```bash
+git checkout -b nova-branch
+git push -u origin nova-branch
+```
+
+Depois você pode usar `gitapprove upload owner/repo -b nova-branch`.
+
+### Como proteger branch no GitHub?
+
+Recomendado para forçar uso do GitApprove:
+
+```bash
+# Método 1: Git local
+git config branch.main.pushRemote no-push
+
+# Método 2: GitHub Settings
+# github.com/owner/repo/settings/branches
+# Add rule → Require pull request reviews
+```
+
+---
+
+## 🐛 Problemas Comuns
+
+### ❌ "Invalid token"
+
+**Causa:** Token expirado ou inválido
+
+**Solução:**
+```bash
+gitapprove login
+```
+
+### ❌ "Unauthorized"
+
+**Causa:** Não está autenticado ou token inválido
+
+**Solução:**
+```bash
+rm ~/.gitaprove/config.json
+gitapprove login
+```
+
+### ❌ "Nenhum commit local para enviar"
+
+**Causa:** Não há commits não enviados
+
+**Solução:**
+```bash
+# Ver se tem commits
+git log origin/main..HEAD
+
+# Se não houver, faça novos commits
+git add .
+git commit -m "mensagem"
+```
+
+### ❌ "Você não é membro do time"
+
+**Causa:** Não está no time do projeto
+
+**Solução:** Peça ao dono do projeto para adicionar você ao time.
+
+### ❌ "Commit already processed"
+
+**Causa:** Tentando aprovar commit já aprovado/rejeitado
+
+**Solução:** Verifique o status no dashboard. Se foi rejeitado, envie novo commit.
+
+### ❌ CLI não abre o navegador
+
+**Causa:** Sistema não suporta `open` command
+
+**Solução:** Abra manualmente:
+```
+https://gitapprove.koyeb.app/dashboard/cli-auth
+```
+
+### ❌ Push automático falha sempre
+
+**Causas possíveis:**
+1. Token OAuth expirado → Logout/Login no dashboard
+2. Branch protegida no GitHub → Ajuste regras
+3. Permissões insuficientes → Verifique token OAuth
+
+---
+
+## 🌿 Branches e Workflow
+
+### Qual é a branch padrão?
+
+`main` - mas você pode especificar qualquer branch com `--branch`.
+
+### Posso usar com Git Flow?
+
+Sim! Exemplo:
+
+```bash
+# Feature branches
+gitapprove upload owner/repo -b feature/login
+
+# Develop
+gitapprove upload owner/repo -b develop
+
+# Release
+gitapprove upload owner/repo -b release/v2.0.0
+
+# Hotfix
+gitapprove upload owner/repo -b hotfix/critical-bug
+```
+
+### Como funciona com pull requests?
+
+GitApprove **substitui** pull requests. O fluxo é:
+
+- ❌ Tradicional: Branch → PR → Review → Merge
+- ✅ GitApprove: Branch → Upload → Approve → Push automático
+
+### Posso usar GitApprove e PRs juntos?
+
+Tecnicamente sim, mas **não é recomendado**. São dois sistemas de revisão. Escolha um:
+- **GitApprove**: Revisão antes do push
+- **PRs**: Revisão depois do push
+
+---
+
+## 🎯 Casos de Uso
+
+### Meu time é pequeno (2 pessoas). Vale a pena?
+
+Sim! Mesmo com 2 pessoas, garante que:
+- Ninguém faz push sem revisão
+- Código é sempre visto por 2 pares de olhos
+- Histórico de aprovações está documentado
+
+### Trabalho sozinho. Posso usar?
+
+Tecnicamente sim, mas o valor é limitado. GitApprove brilha com times de 2+ pessoas.
+
+### Como usar em projetos open source?
+
+1. Crie projeto no GitApprove
+2. Adicione mantenedores ao time
+3. Contribuidores externos: envie PRs normais no GitHub
+4. Mantenedores internos: usam GitApprove
+
+### Funciona com monorepos?
+
+Sim! Cada monorepo é um projeto. Todos os commits vão para o mesmo repositório.
+
+### Posso usar em CI/CD?
+
+Sim! Configure o token CLI como secret:
+
+```yaml
+# GitHub Actions exemplo
+- name: Upload to GitApprove
+  run: |
+    echo '{"apiUrl":"https://gitapprove.koyeb.app","token":"${{ secrets.GITAPPROVE_TOKEN }}"}' > ~/.gitaprove/config.json
+    gitapprove upload owner/repo
+```
+
+---
+
+## 📊 Dashboard Web
+
+### Como acessar o dashboard?
+
+https://gitapprove.koyeb.app/dashboard
+
+Faça login com GitHub OAuth.
+
+### Posso aprovar pelo dashboard?
+
+Sim! É a forma mais comum. Veja o diff completo dos arquivos e aprove/rejeite.
+
+### Como ver histórico de aprovações?
+
+Dashboard → Histórico
+
+Veja todos os commits, quem aprovou, quando, e comentários.
+
+### Recebo notificações?
+
+Sim, no dashboard. Notificações por email estão em desenvolvimento.
+
+---
+
+## 🔄 Atualizações
+
+### Como saber se há nova versão?
+
+```bash
+gitapprove update-check
+```
+
+Ou o CLI verifica automaticamente a cada execução (não intrusivo).
+
+### Como atualizar?
+
 ```bash
 npm update -g gitapprove
 ```
 
-### Qual a versão mais recente do CLI?
-v2.1.3 (com push automático via OAuth)
+### Onde vejo o changelog?
 
-## 🔐 Segurança
-
-### Meu código fica seguro?
-Sim. Você faz login com GitHub OAuth. Não armazenamos senhas.
-
-### Quem pode ver meus commits?
-Apenas membros do seu time no GitApprove.
-
-### Posso revogar meu token CLI?
-Sim, no dashboard: Configurações → Revogar Token
-
-### E o token OAuth?
-Para revogar, faça logout do dashboard. Ou revogue no GitHub: Settings → Applications → GitApprove
-
-## 👥 Times e Aprovações
-
-### Quantas pessoas precisam aprovar?
-TODOS os membros do time (exceto o autor do commit).
-
-### Posso aprovar meu próprio commit?
-Não. O sistema bloqueia auto-aprovação.
-
-### E se alguém rejeitar?
-O commit fica com status "rejeitado" e não vai para o GitHub. O autor precisa corrigir e enviar novamente.
-
-### Posso ter múltiplos times?
-Sim! Cada projeto pode ter seu próprio time.
-
-## 🚀 Workflow
-
-### Qual é o fluxo correto?
-```bash
-1. git commit -m "..."
-2. gitapprove upload  # NÃO faça git push
-3. Time aprova via web
-4. Push automático via OAuth quando todos aprovarem!
-```
-
-### E se eu fizer `git push` direto?
-O commit vai para o GitHub normalmente, mas não passa pela aprovação do time.
-
-### Posso enviar vários commits de uma vez?
-Sim:
-```bash
-gitapprove upload -n 3  # Envia últimos 3 commits
-```
-
-### Como vejo status dos meus commits?
-```bash
-gitapprove list
-```
-Ou acesse: https://gitapprove.koyeb.app/dashboard/pending
-
-## 🔧 Problemas Técnicos
-
-### "Comando não encontrado"
-```bash
-# Reinstale globalmente
-npm install -g gitapprove
-
-# Verifique PATH
-which gitapprove
-```
-
-### "Token CLI inválido"
-```bash
-# Gere novo token e configure
-gitapprove config --token gat_novo_token
-```
-
-### "Erro de conexão"
-```bash
-# Verifique servidor
-gitapprove config --server https://gitapprove.koyeb.app
-
-# Teste conexão
-curl https://gitapprove.koyeb.app/api/health
-```
-
-### "Push automático falhou"
-Verifique no dashboard web os logs de erro. Possíveis causas:
-- Token OAuth expirado → Faça logout e login novamente
-- Branch protegida no GitHub → Remova proteção ou ajuste regras
-- Repositório vazio → Faça push inicial manualmente
-- Sem permissão de push → Verifique permissões no GitHub
-
-### "Repositório vazio ou branch não existe"
-O sistema detecta quando o repositório está vazio. Solução:
-```bash
-# Crie commit inicial
-echo "# Meu Projeto" > README.md
-git add README.md
-git commit -m "Initial commit"
-git push origin main
-
-# Depois use GitApprove normalmente
-gitapprove upload
-```
-
-## 📊 Features
-
-### Posso ver quem aprovou?
-Sim! No dashboard web, clique em "Detalhes" do commit.
-
-### Tem histórico de aprovações?
-Sim. Dashboard → Histórico mostra todos os commits.
-
-### Posso adicionar comentários?
-Sim. Ao aprovar/rejeitar, você pode adicionar comentários.
-
-### Tem notificações?
-No momento, apenas via dashboard web. Email notifications em breve.
-
-## 🌐 Deploy e Hospedagem
-
-### Posso hospedar eu mesmo?
-Sim! O sistema usa Docker e PostgreSQL.
-
-### Qual o requisito mínimo?
-- 512MB RAM
-- PostgreSQL 14+
-- Node.js 18+
-- Docker (opcional)
-
-### Tem deploy gratuito?
-Sim! Koyeb, Fly.io, Railway oferecem tier gratuito.
-
-## 💡 Melhores Práticas
-
-### Commits atômicos
-Faça um commit = uma funcionalidade. Mais fácil de revisar.
-
-### Mensagens claras
-Use conventional commits:
-```bash
-feat: adicionar login
-fix: corrigir bug no header
-docs: atualizar README
-```
-
-### Revise rápido
-Não deixe commits pendentes por muito tempo.
-
-### Comunique-se
-Use os comentários para dar feedback construtivo.
-
-## 📞 Suporte
-
-### Como reporto um bug?
-Abra uma issue: https://github.com/jotav96/GitApprove/issues
-
-### Como sugiro uma feature?
-Mesma URL acima, descreva sua sugestão.
-
-### Tem Discord/Slack?
-Em breve! Por enquanto use as issues do GitHub.
-
-## 📚 Recursos
-
-- [README Principal](./README.md)
-- [Instalação CLI](./CLI-INSTALL.md)
-- [Guia Rápido](./QUICKSTART.md)
-- [NPM Package](https://www.npmjs.com/package/gitapprove)
-- [Repositório GitHub](https://github.com/jotav96/GitApprove)
+[CHANGELOG.md](./CHANGELOG.md) ou https://npmjs.com/package/gitapprove
 
 ---
 
-**Tem outra dúvida? Abra uma [issue](https://github.com/jotav96/GitApprove/issues)!**
+## 🆘 Suporte
 
-**Desenvolvido por José Vitor**
+### Onde reportar bugs?
+
+https://github.com/jotav96/GitApprove/issues
+
+### Como pedir novas features?
+
+Abra uma issue com a tag `enhancement`.
+
+### Há suporte oficial?
+
+Projeto open source comunitário. Suporte via issues e discussões no GitHub.
+
+### Posso contribuir?
+
+Sim! PRs são bem-vindos. Veja [CONTRIBUTING.md](./CONTRIBUTING.md) (quando criado).
+
+---
+
+## 💡 Dicas Avançadas
+
+### Alias úteis
+
+```bash
+# ~/.bashrc ou ~/.zshrc
+alias gap='gitapprove upload'
+alias gal='gitapprove list'  
+alias gas='gitapprove status'
+alias galogin='gitapprove login'
+```
+
+### Ver commits antes de enviar
+
+```bash
+git log origin/main..HEAD --oneline
+git diff origin/main..HEAD --stat
+```
+
+### Múltiplos repositórios
+
+Se trabalha em vários repos, crie scripts:
+
+```bash
+# upload-all.sh
+gitapprove upload org/repo1
+gitapprove upload org/repo2
+gitapprove upload org/repo3
+```
+
+### Integração com IDEs
+
+Configure task no VS Code:
+
+```json
+{
+  "label": "GitApprove Upload",
+  "type": "shell",
+  "command": "gitapprove upload owner/repo",
+  "problemMatcher": []
+}
+```
+
+---
+
+**Não encontrou sua pergunta?** Abra uma issue: https://github.com/jotav96/GitApprove/issues

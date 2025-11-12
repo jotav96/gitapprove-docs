@@ -1,175 +1,205 @@
-# GitApprove - Sistema de Aprovação de Commits em Equipe
+# GitApprove
 
-![NPM Version](https://img.shields.io/npm/v/gitapprove)
-![NPM Downloads](https://img.shields.io/npm/dm/gitapprove)
-![License](https://img.shields.io/npm/l/gitapprove)
+**Sistema de Aprovação de Commits para GitHub** com autenticação automática e push via OAuth.
 
-Sistema profissional de aprovação colaborativa de commits integrado ao GitHub, com interface web moderna e **push automático via OAuth**.
+GitApprove é uma ferramenta que adiciona um processo de revisão e aprovação de código **antes** que os commits cheguem ao GitHub. Perfeito para times que querem garantir que todo código seja revisado antes de ser mergeado.
 
-## ⚠️ IMPORTANTE: NÃO USE `git push`!
+## 🎯 O Que é GitApprove?
 
-**O GitApprove substitui o `git push` tradicional.** Ao invés de fazer push diretamente, você envia commits para aprovação da equipe:
+- **Revisão obrigatória**: Nenhum código vai para o GitHub sem aprovação
+- **Push automático**: Commits aprovados são enviados automaticamente via OAuth
+- **Interface web**: Dashboard bonito para revisar e aprovar commits
+- **CLI poderoso**: Ferramenta de linha de comando para desenvolvedores
+- **Times e projetos**: Organize seus repositórios e colaboradores
+- **Autenticação simplificada**: Login automático sem configuração manual
 
-```bash
-# ❌ NÃO FAÇA ISSO
-git push origin main
-
-# ✅ FAÇA ISSO
-gitapprove upload
-```
-
-**📖 [Leia o Guia Completo de Workflow →](./WORKFLOW.md)**
-
----
-
-## 🚀 Features
-
-- ✅ **Push Automático via OAuth** - GitHub token salvo automaticamente no login!
-- ✅ **Aprovação em Equipe** - TODOS os membros do time precisam aprovar
-- ✅ **Interface Web Moderna** - Dashboard profissional com tema claro/escuro
-- ✅ **CLI Global** - Comando `gitapprove` instalado via npm (v2.1.3)
-- ✅ **Tokens CLI Permanentes** - Token individual por usuário (formato: gat_...)
-- ✅ **GitHub API Direct** - Push sem clone via API REST
-- ✅ **Docker Ready** - Deploy facilitado com containers
-- ✅ **Gestão de Times** - Adicione colaboradores e gerencie equipes
-
-## 📦 Instalação Rápida
+## 🚀 Instalação Rápida
 
 ```bash
-# Instalar CLI globalmente
+# 1. Instalar CLI globalmente
 npm install -g gitapprove
 
-# Obter token em: https://gitapprove.koyeb.app/dashboard/settings
-gitapprove config --token gat_seu_token_aqui
+# 2. Fazer login (abre navegador automaticamente)
+gitapprove login
 
-# Verificar configuração
-gitapprove whoami
+# 3. Pronto! Comece a usar
+gitapprove upload owner/repo
 ```
 
-## 🎯 Links Importantes
+**É isso!** Token salvo automaticamente, sem edição de arquivos. ✨
 
-- **🌐 Web App:** https://gitapprove.koyeb.app
-- **📖 Workflow Completo:** [WORKFLOW.md](./WORKFLOW.md)
-- **🚀 Início Rápido:** [QUICKSTART.md](./QUICKSTART.md)
-- **📦 NPM Package:** https://www.npmjs.com/package/gitapprove
-- **🐙 Repositório:** https://github.com/jotav96/GitApprove
-- **❓ FAQ:** [FAQ.md](./FAQ.md)
-- **📜 Changelog:** [CHANGELOG.md](./CHANGELOG.md)
+## 📖 Como Funciona
 
-## 💻 Uso Básico
+### Fluxo Tradicional (sem GitApprove):
+```
+Desenvolvedor → git push → GitHub ✅
+```
+❌ Código não revisado vai direto para produção!
 
-### 1. Faça Login no Dashboard (OAuth Automático)
+### Fluxo com GitApprove:
+```
+Desenvolvedor → gitapprove upload → Dashboard de Revisão → Time Aprova → Push Automático → GitHub ✅
+```
+✅ Todo código é revisado antes de ir para o GitHub!
 
-1. Acesse https://gitapprove.koyeb.app
-2. Clique em **"Login com GitHub"**
-3. Autorize o aplicativo
-4. **GitHub token OAuth salvo automaticamente!** 🎉
+## 💻 Uso Diário
 
-### 2. Gere seu Token CLI
-
-1. **Dashboard** → **Configurações** (⚙️)
-2. **Gerar Token CLI**
-3. Copie o token (formato: `gat_...`)
-4. Configure no CLI
-
-### 3. Desenvolva Normalmente
+### Para Desenvolvedores
 
 ```bash
-cd seu-projeto
+# Fazer commits normalmente
 git add .
 git commit -m "feat: nova funcionalidade"
-```
 
-### 4. Envie para Aprovação (NÃO use git push!)
+# ⚠️ NÃO USE "git push"! Use o GitApprove:
+gitapprove upload owner/repo
 
-```bash
-gitapprove upload
-```
+# Ou especifique uma branch
+gitapprove upload owner/repo --branch develop
 
-### 5. Aguarde Aprovação
-
-- Time revisa no dashboard: https://gitapprove.koyeb.app/dashboard/pending
-- Quando TODOS aprovarem, **push automático via OAuth para GitHub!**
-
-### 6. Aprove Commits dos Colegas
-
-```bash
-# Via CLI
+# Ver seus commits pendentes
 gitapprove list
-gitapprove approve <hash>
 
-# Ou via Web
-# Acesse: https://gitapprove.koyeb.app/dashboard/pending
+# Ver status
+gitapprove status
 ```
+
+### Para Revisores
+
+Acesse o dashboard: **https://gitapprove.koyeb.app/dashboard**
+
+1. Veja commits pendentes
+2. Revise o código e arquivos modificados
+3. Aprove ou rejeite com comentários
+4. Sistema faz push automático quando todos aprovarem!
 
 ## 📚 Documentação Completa
 
-| Documento | Descrição |
-|-----------|-----------|
-| **[WORKFLOW.md](./WORKFLOW.md)** | 📖 Guia completo do fluxo de trabalho |
-| **[QUICKSTART.md](./QUICKSTART.md)** | 🚀 Tutorial de início rápido |
-| **[CLI-INSTALL.md](./CLI-INSTALL.md)** | 💻 Instalação e configuração do CLI |
-| **[FAQ.md](./FAQ.md)** | ❓ Perguntas frequentes |
-| **[CHANGELOG.md](./CHANGELOG.md)** | 📜 Histórico de versões |
+- **[Guia Rápido (QUICKSTART.md)](./QUICKSTART.md)** - Comece em 5 minutos
+- **[Perguntas Frequentes (FAQ.md)](./FAQ.md)** - Dúvidas comuns
+- **[Changelog (CHANGELOG.md)](./CHANGELOG.md)** - Histórico de versões
 
-## 🔐 Configuração de Times
-
-Para que os commits apareçam no dashboard, você precisa:
-
-1. Criar um time no dashboard
-2. Vincular seus projetos ao time
-3. Adicionar membros ao time
-
-**Sem um time configurado, os commits não aparecerão para ninguém!**
-
-Acesse: https://gitapprove.koyeb.app/dashboard/teams
-
-## 🛠️ Comandos CLI
+## 🔑 Comandos do CLI
 
 ```bash
-# Configuração
-gitapprove config --token <TOKEN>
-gitapprove whoami
+# Autenticação
+gitapprove login              # Login automático (abre navegador)
 
-# Workflow
-gitapprove upload                # Enviar commits para aprovação
-gitapprove list                  # Ver commits pendentes
-gitapprove approve <hash>        # Aprovar commit
-gitapprove reject <hash>         # Rejeitar commit
+# Enviar commits
+gitapprove upload owner/repo                    # Branch main (padrão)
+gitapprove upload owner/repo -b develop         # Branch develop
+gitapprove upload owner/repo --branch feature   # Branch feature
 
-# Ajuda
-gitapprove --help
+# Consultas
+gitapprove list               # Commits pendentes
+gitapprove list --all         # Todos os commits
+gitapprove status             # Ver estatísticas
+
+# Utilidades
+gitapprove update-check       # Verificar atualizações
+gitapprove --help             # Ajuda completa
+gitapprove --version          # Versão instalada
 ```
 
-## ✨ Como Funciona o Push Automático via OAuth
+## 🌟 Recursos Principais
 
-1. **Login com GitHub** → Sistema recebe token OAuth com permissão `repo`
-2. **Token salvo automaticamente** → Armazenado no banco de dados
-3. **Commit aprovado** → Sistema detecta aprovação unânime
-4. **Push via GitHub API** → Usa token OAuth para push direto (sem clone!)
-5. **Commit no GitHub** → Aparece com autor original preservado
+### ✅ Push Automático via OAuth
+- Commits aprovados são enviados automaticamente para o GitHub
+- Usa o token OAuth do dono do projeto
+- Sem necessidade de configurar deploy keys ou tokens manualmente
+- Funciona com repositórios privados
 
-**Nenhuma configuração manual de tokens! Tudo automático! 🚀**
+### 👥 Sistema de Times
+- Organize colaboradores por projeto
+- Todos os membros do time precisam aprovar
+- Autor não pode aprovar o próprio commit
+- Estatísticas de aprovação em tempo real
+
+### 📊 Dashboard Completo
+- Interface web moderna e intuitiva
+- Visualize arquivos modificados (diff completo)
+- Histórico de commits e aprovações
+- Notificações de status
+
+### 🔒 Segurança
+- Autenticação via GitHub OAuth
+- Tokens seguros e criptografados
+- Permissões granulares por projeto
+- Auditoria completa de aprovações
+
+## 🛠️ Configuração de Projetos
+
+### 1. Criar Projeto no Dashboard
+- Acesse https://gitapprove.koyeb.app/dashboard/projects
+- Conecte seu repositório GitHub
+- Configure o time de revisão
+
+### 2. Proteger Branch no GitHub (Recomendado)
+Para garantir que ninguém faça push direto:
+
+```bash
+# No seu repositório local
+git config branch.main.pushRemote no-push
+
+# Ou via GitHub:
+# Settings → Branches → Add rule
+# ✅ Require pull request reviews
+# ✅ Require status checks
+```
+
+### 3. Configurar Webhooks (Opcional)
+Para notificações automáticas de aprovações e rejeições.
+
+## 🌐 Links Úteis
+
+- **Dashboard**: https://gitapprove.koyeb.app
+- **NPM Package**: https://npmjs.com/package/gitapprove
+- **Documentação**: https://github.com/jotav96/gitapprove-docs
+- **Issues**: https://github.com/jotav96/GitApprove/issues
+
+## ⚠️ Importante
+
+### ❌ Nunca use `git push` diretamente
+Isso pula todo o processo de revisão!
+
+### ✅ Sempre use `gitapprove upload`
+O sistema faz o push automaticamente após aprovação.
+
+### 🔄 Se o push automático falhar
+1. Faça logout e login novamente no dashboard
+2. Isso renova o token OAuth do GitHub
+3. Tente aprovar novamente
 
 ## 🤝 Contribuindo
 
-Este é um projeto em desenvolvimento ativo. Para reportar bugs ou sugerir melhorias:
+Encontrou um bug? Tem uma sugestão?
 
-- Abra uma issue neste repositório
-- Entre em contato via GitHub
+- Abra uma issue: https://github.com/jotav96/GitApprove/issues
+- Envie um PR (depois de aprovado no GitApprove, claro! 😄)
 
-## 📄 Licença
+## 📝 Licença
 
-MIT License - Veja [LICENSE](./LICENSE) para mais detalhes
+MIT License - Use livremente em projetos pessoais e comerciais.
 
-## 👨‍💻 Autor
+## 🎓 Casos de Uso
 
-**José Vitor** (@jotav96)
-- GitHub: https://github.com/jotav96
-- NPM: https://www.npmjs.com/~jotav96
+### Times de Desenvolvimento
+- Code review obrigatório antes do merge
+- Garantir qualidade do código
+- Auditoria de quem aprovou cada commit
+
+### Projetos Open Source
+- Múltiplos mantenedores revisando contribuições
+- Processo transparente de aprovação
+- Histórico completo de decisões
+
+### Empresas
+- Compliance e auditoria
+- Separação de responsabilidades
+- Controle de qualidade de código
 
 ---
 
-**🎯 Lembre-se: Use `gitapprove upload` ao invés de `git push`!**
+**Desenvolvido com ❤️ para melhorar a qualidade do código e facilitar revisões em equipe.**
 
-📖 **[Leia o Guia Completo de Workflow →](./WORKFLOW.md)**
+Comece agora: `npm install -g gitapprove && gitapprove login`
