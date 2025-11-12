@@ -2,29 +2,36 @@
 
 ## 🚀 Início Rápido em 5 Minutos
 
-### 1. Instale o CLI
+### 1. Login no Dashboard (OAuth Automático!)
+1. Acesse: https://gitapprove.koyeb.app
+2. Clique em **"Login com GitHub"**
+3. Autorize o aplicativo
+4. **GitHub token OAuth salvo automaticamente!** 🎉
+
+### 2. Gere seu Token CLI
+1. **Dashboard** → **Configurações** (⚙️)
+2. **Gerar Token CLI**
+3. Copie o token (formato: `gat_...`)
+
+### 3. Instale o CLI
 ```bash
 npm install -g gitapprove
 ```
 
-### 2. Obtenha seu Token
-1. Acesse: https://gitapprove.koyeb.app
-2. Login com GitHub
-3. Configurações → Gerar Token
-4. Copie o token
-
-### 3. Configure
+### 4. Configure
 ```bash
 gitapprove config --token gat_seu_token
 gitapprove whoami
 ```
 
-### 4. Use!
+### 5. Use!
 ```bash
 cd ~/seu-projeto
 git commit -m "feat: nova feature"
 gitapprove upload
 ```
+
+**Aguarde aprovação → Push automático via OAuth! 🚀**
 
 ## 📋 Fluxo de Trabalho Completo
 
@@ -43,7 +50,7 @@ gitapprove upload
 # 4. Aguarde aprovações do time
 gitapprove list
 
-# 5. Quando aprovado, push é automático!
+# 5. Quando aprovado, push é automático via OAuth!
 ```
 
 ### Para quem APROVA commits:
@@ -52,7 +59,7 @@ gitapprove list
 2. Veja commits dos colegas
 3. Revise o código
 4. Clique: ✓ Aprovar ou ✗ Rejeitar
-5. Sistema faz push quando todos aprovarem
+5. Sistema faz push automático quando todos aprovarem
 
 ## 🎯 Comandos Mais Usados
 
@@ -76,10 +83,19 @@ gitapprove upload -n 3
 ✅ **Mensagens claras** - Use conventional commits  
 ✅ **Não force push** - Aguarde aprovação  
 ✅ **Revise rápido** - Não deixe o time esperando  
+✅ **Login regular** - Mantenha token OAuth válido
+
+## ⚡ Como Funciona o Push Automático
+
+```
+Login GitHub → Token OAuth salvo → Commit aprovado → Push via API → Pronto!
+```
+
+**Nenhuma configuração manual! Totalmente automático! 🎉**
 
 ## ❌ Erros Comuns
 
-### "Token inválido"
+### "Token CLI inválido"
 ```bash
 # Gere novo token no dashboard e configure
 gitapprove config --token gat_novo_token
@@ -98,8 +114,27 @@ gitapprove upload
 git log  # Veja se tem commits
 ```
 
+### "Push automático falhou"
+```bash
+# Token OAuth expirado - Faça logout e login novamente
+# Ou repositório vazio - Faça push inicial manualmente
+```
+
+### "Repositório vazio"
+Se o repo não tem commits ainda:
+```bash
+echo "# Meu Projeto" > README.md
+git add README.md
+git commit -m "Initial commit"
+git push origin main
+
+# Agora use GitApprove
+gitapprove upload
+```
+
 ## 📚 Próximos Passos
 
+- [Workflow Completo](./WORKFLOW.md)
 - [Instalação Completa](./CLI-INSTALL.md)
 - [FAQ](./FAQ.md)
 - [README Principal](./README.md)

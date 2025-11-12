@@ -2,74 +2,89 @@
 
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
-## [2.0.1] - 2025-11-10
-
-### Changed
-- Removido link para repositório privado do GitHub
-- Links atualizados para apontar para gitapprove.koyeb.app
-- Melhorias na documentação
-
-## [2.0.0] - 2025-11-10
-
-### Added
-- 🎉 Primeira versão pública do CLI no NPM
-- Comando `gitapprove` instalável globalmente
-- Autenticação via token permanente (formato gat_)
-- Upload de commits para aprovação
-- Listagem de commits pendentes
-- Aprovação/rejeição via CLI
-- Configuração de servidor customizado
-
-### Features
-- ✅ Upload automático de commits
-- ✅ Aprovação colaborativa em equipe
-- ✅ Push automático após todas as aprovações
-- ✅ Interface web moderna
-- ✅ Dashboard com estatísticas
-- ✅ Gestão de times
-- ✅ Histórico completo
-- ✅ GitHub OAuth integration
-
-### CLI Commands
-```bash
-gitapprove config --token <token>
-gitapprove config --server <url>
-gitapprove whoami
-gitapprove upload
-gitapprove upload -n <number>
-gitapprove list
-gitapprove list --all
-gitapprove approve <hash>
-gitapprove reject <hash> -c "comment"
-```
-
-### Technical Stack
-- Next.js 14.2.33
-- React 18
-- TypeScript
-- Tailwind CSS
-- MySQL 8.0
-- NextAuth.js
-- Docker
-
-### Deploy Options
-- Koyeb (Free tier)
-- Fly.io (Free tier)
-- Railway (Free tier)
-- Oracle Cloud (Always Free)
-- VPS próprio
-
----
-
-## Formato
-
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
-### Tipos de mudanças
-- **Added** - Novas funcionalidades
-- **Changed** - Mudanças em funcionalidades existentes
-- **Deprecated** - Funcionalidades que serão removidas
-- **Removed** - Funcionalidades removidas
-- **Fixed** - Correção de bugs
-- **Security** - Correções de segurança
+## [2.1.3] - 2024-11-12
+
+### ✨ Adicionado
+- **Push Automático via OAuth!** - Sistema agora usa token GitHub OAuth salvo automaticamente no login
+- Validação de repositórios vazios com mensagem de erro clara e instruções
+- Push direto via GitHub API (sem necessidade de clone)
+- Detecção automática de branch vazia (404) com instruções de inicialização
+
+### 🔧 Corrigido
+- Repositório npm corrigido de `gitapprove-docs` (privado) para `GitApprove` (público)
+- Mensagens de erro melhoradas para repositórios sem commits
+- Tratamento de erro 404 ao tentar push em repo vazio
+
+### 📝 Alterado
+- Documentação atualizada com fluxo OAuth automático
+- README.md com ênfase no push sem configuração manual
+- FAQ expandido com perguntas sobre OAuth e repos vazios
+- CLI-INSTALL.md atualizado com diferença entre token OAuth e token CLI
+
+### 🗑️ Removido
+- Endpoints de debug (`/api/debug/*`) - 9 arquivos, ~459 linhas
+- Arquivos de teste da raiz - 29 arquivos (migration-*.sql, test-*.*, etc)
+- Script check-tokens.js obsoleto
+
+## [2.1.2] - 2024-11-10
+
+### 🔧 Corrigido
+- Correção de bugs no sistema de aprovação
+- Melhorias na sincronização de times
+
+## [2.1.0] - 2024-11-08
+
+### ✨ Adicionado
+- Sistema de times e membros
+- Dashboard com estatísticas
+- Filtros de commits por status
+- Gestão de colaboradores GitHub
+
+### 🔧 Corrigido
+- Performance na listagem de commits
+- Sincronização com repositórios GitHub
+
+## [2.0.1] - 2024-11-05
+
+### 🔧 Corrigido
+- Correções de bugs menores
+- Melhorias na estabilidade do CLI
+
+## [2.0.0] - 2024-11-01
+
+### ✨ Adicionado
+- CLI global via npm
+- Sistema de aprovação colaborativa
+- Interface web moderna
+- Autenticação GitHub OAuth
+- Tokens permanentes (gat_...)
+- Dashboard de commits
+- Sistema de notificações
+- Docker Compose completo
+
+### 🔧 Corrigido
+- Primeira versão estável
+
+## [1.0.0] - 2024-10-15
+
+### ✨ Adicionado
+- Versão inicial do projeto
+- Conceito básico de aprovação de commits
+
+---
+
+## Tipos de Mudanças
+
+- `✨ Adicionado` - Para novas funcionalidades
+- `🔧 Corrigido` - Para correções de bugs
+- `📝 Alterado` - Para mudanças em funcionalidades existentes
+- `🗑️ Removido` - Para funcionalidades removidas
+- `🔒 Segurança` - Para correções de vulnerabilidades
+- `📚 Documentação` - Para mudanças apenas na documentação
+
+---
+
+**Desenvolvido por José Vitor**

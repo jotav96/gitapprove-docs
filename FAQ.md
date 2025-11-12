@@ -11,6 +11,31 @@ Sim! O CLI é open source (NPM) e o sistema pode ser auto-hospedado gratuitament
 ### Preciso pagar?
 Não. Use a versão hospedada em https://gitapprove.koyeb.app gratuitamente ou instale em seu próprio servidor.
 
+## 🔐 OAuth e Tokens
+
+### Como funciona o push automático?
+Quando você faz login com GitHub, o sistema recebe um token OAuth com permissão `repo`. Esse token é salvo automaticamente e usado para fazer push via GitHub API quando um commit é totalmente aprovado.
+
+### Preciso configurar GitHub token manualmente?
+**Não!** O token OAuth é configurado automaticamente no login. Apenas faça login novamente se o push falhar.
+
+### Qual a diferença entre token OAuth e token CLI?
+- **Token OAuth** (automático): Para push no GitHub, salvo no login
+- **Token CLI** (`gat_...`): Para autenticação do CLI com o sistema GitApprove
+
+### O token OAuth expira?
+Sim, mas o sistema renova automaticamente. Se o push falhar, faça logout e login novamente no dashboard.
+
+### O que acontece se o repositório estiver vazio?
+Se o repo não tiver commits ainda, você precisa fazer um push inicial manualmente:
+```bash
+echo "# Meu Projeto" > README.md
+git add README.md
+git commit -m "Initial commit"
+git push origin main
+```
+Depois use `gitapprove upload` normalmente!
+
 ## 💻 CLI
 
 ### Como instalo o CLI?
@@ -18,21 +43,24 @@ Não. Use a versão hospedada em https://gitapprove.koyeb.app gratuitamente ou i
 npm install -g gitapprove
 ```
 
-### Onde obtenho o token?
+### Onde obtenho o token CLI?
 1. Acesse https://gitapprove.koyeb.app
-2. Login com GitHub
-3. Configurações → Gerar Token
+2. Login com GitHub (OAuth automático!)
+3. Configurações → Gerar Token CLI
 
-### O token expira?
-Não. Tokens são permanentes até serem revogados manualmente.
+### O token CLI expira?
+Não. Tokens CLI são permanentes até serem revogados manualmente.
 
 ### Posso usar em múltiplos computadores?
-Sim! Use o mesmo token em todos os computadores.
+Sim! Use o mesmo token CLI em todos os computadores.
 
 ### Como atualizo o CLI?
 ```bash
 npm update -g gitapprove
 ```
+
+### Qual a versão mais recente do CLI?
+v2.1.3 (com push automático via OAuth)
 
 ## 🔐 Segurança
 
@@ -42,8 +70,11 @@ Sim. Você faz login com GitHub OAuth. Não armazenamos senhas.
 ### Quem pode ver meus commits?
 Apenas membros do seu time no GitApprove.
 
-### Posso revogar meu token?
+### Posso revogar meu token CLI?
 Sim, no dashboard: Configurações → Revogar Token
+
+### E o token OAuth?
+Para revogar, faça logout do dashboard. Ou revogue no GitHub: Settings → Applications → GitApprove
 
 ## 👥 Times e Aprovações
 
@@ -66,7 +97,7 @@ Sim! Cada projeto pode ter seu próprio time.
 1. git commit -m "..."
 2. gitapprove upload  # NÃO faça git push
 3. Time aprova via web
-4. Push automático quando todos aprovarem
+4. Push automático via OAuth quando todos aprovarem!
 ```
 
 ### E se eu fizer `git push` direto?
@@ -95,7 +126,7 @@ npm install -g gitapprove
 which gitapprove
 ```
 
-### "Token inválido"
+### "Token CLI inválido"
 ```bash
 # Gere novo token e configure
 gitapprove config --token gat_novo_token
@@ -112,9 +143,23 @@ curl https://gitapprove.koyeb.app/api/health
 
 ### "Push automático falhou"
 Verifique no dashboard web os logs de erro. Possíveis causas:
-- Branch protegida no GitHub
-- Sem permissão de push
-- Conflito de merge
+- Token OAuth expirado → Faça logout e login novamente
+- Branch protegida no GitHub → Remova proteção ou ajuste regras
+- Repositório vazio → Faça push inicial manualmente
+- Sem permissão de push → Verifique permissões no GitHub
+
+### "Repositório vazio ou branch não existe"
+O sistema detecta quando o repositório está vazio. Solução:
+```bash
+# Crie commit inicial
+echo "# Meu Projeto" > README.md
+git add README.md
+git commit -m "Initial commit"
+git push origin main
+
+# Depois use GitApprove normalmente
+gitapprove upload
+```
 
 ## 📊 Features
 
@@ -133,11 +178,11 @@ No momento, apenas via dashboard web. Email notifications em breve.
 ## 🌐 Deploy e Hospedagem
 
 ### Posso hospedar eu mesmo?
-Sim! O sistema usa Docker. Solicite acesso ao código-fonte.
+Sim! O sistema usa Docker e PostgreSQL.
 
 ### Qual o requisito mínimo?
 - 512MB RAM
-- MySQL 8.0
+- PostgreSQL 14+
 - Node.js 18+
 - Docker (opcional)
 
@@ -166,7 +211,7 @@ Use os comentários para dar feedback construtivo.
 ## 📞 Suporte
 
 ### Como reporto um bug?
-Abra uma issue: https://github.com/jotav96/gitapprove-docs/issues
+Abra uma issue: https://github.com/jotav96/GitApprove/issues
 
 ### Como sugiro uma feature?
 Mesma URL acima, descreva sua sugestão.
@@ -180,9 +225,10 @@ Em breve! Por enquanto use as issues do GitHub.
 - [Instalação CLI](./CLI-INSTALL.md)
 - [Guia Rápido](./QUICKSTART.md)
 - [NPM Package](https://www.npmjs.com/package/gitapprove)
+- [Repositório GitHub](https://github.com/jotav96/GitApprove)
 
 ---
 
-**Tem outra dúvida? Abra uma [issue](https://github.com/jotav96/gitapprove-docs/issues)!**
+**Tem outra dúvida? Abra uma [issue](https://github.com/jotav96/GitApprove/issues)!**
 
 **Desenvolvido por José Vitor**
